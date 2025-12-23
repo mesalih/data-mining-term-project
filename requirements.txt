@@ -1,0 +1,8 @@
+pandas
+numpy
+scikit-learn
+nltk
+rich
+typer
+google-generativeai
+python-dotenv
