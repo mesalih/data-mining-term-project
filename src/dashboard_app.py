@@ -12,9 +12,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# No Custom CSS needed for standard Light Theme
-# Streamlit's default is clean and readable.
-
 @st.cache_data
 def load_data():
     if os.path.exists("results_output.csv"):

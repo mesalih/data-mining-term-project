@@ -4,10 +4,6 @@ from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.panel import Panel
-from rich.layout import Layout
-from rich import print as rprint
-from rich.live import Live
-from rich.columns import Columns
 
 from src.data_collector import DataCollector
 from src.preprocessor import Preprocessor
