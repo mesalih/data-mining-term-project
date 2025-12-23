@@ -111,6 +111,22 @@ def main():
     df.to_csv("results_output.csv", index=False)
     console.print("Saved to [bold]results_output.csv[/bold]")
 
+    # Visualization Prompt (Streamlit)
+    from rich.prompt import Confirm
+    import subprocess
+    import sys
+    
+    if Confirm.ask("\n[bold cyan]Do you want to visualize the results (Streamlit Dashboard)?[/bold cyan]"):
+        console.print("[green]Launching Streamlit App...[/green]")
+        console.print("[dim]Press Ctrl+C to stop the dashboard server.[/dim]")
+        try:
+            # Run "streamlit run src/dashboard_app.py"
+            subprocess.run([sys.executable, "-m", "streamlit", "run", "src/dashboard_app.py"], check=True)
+        except KeyboardInterrupt:
+            console.print("\n[yellow]Dashboard stopped.[/yellow]")
+        except Exception as e:
+            console.print(f"[bold red]Error launching dashboard:[/bold red] {e}")
+
 if __name__ == "__main__":
     try:
         main()

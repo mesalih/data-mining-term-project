@@ -4,3 +4,5 @@ __pycache__/
 .env
 .DS_Store
 results_output.csv
+results_dashboard.html
+

@@ -4,5 +4,8 @@ scikit-learn
 nltk
 rich
 typer
-google-generativeai
+google-genai
 python-dotenv
+plotly
+nbformat
+streamlit
