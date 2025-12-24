@@ -4,8 +4,8 @@ scikit-learn
 nltk
 rich
 typer
-google-genai
 python-dotenv
 plotly
 nbformat
 streamlit
+requests

@@ -2,20 +2,86 @@ import pandas as pd
 import random
 import uuid
 import os
+import requests
+import zipfile
+import shutil
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
-from google import genai
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
+
+console = Console()
 
 class DataCollector:
     def __init__(self, topic="Yapay Zeka"):
         self.topic = topic
-        load_dotenv()
-        self.api_key = os.getenv("GEMINI_API_KEY")
+        self.data_dir = os.path.join(os.path.dirname(__file__), "..", "data")
+        self.zip_path = os.path.join(self.data_dir, "tweets.zip")
+        self.csv_path = os.path.join(self.data_dir, "tweets.csv")
+        self.repo_url = "https://github.com/ezgisubasi/turkish-tweets-sentiment-analysis/archive/refs/heads/master.zip"
         self.users = ["user123", "cool_boy", "tech_savy", "ayse_yilmaz", "mehmet_b", "john_doe", "ai_lover", "skeptic_guy"]
-    
+        
+        # Ensure data directory exists
+        if not os.path.exists(self.data_dir):
+            os.makedirs(self.data_dir)
+
+    def _download_and_extract_if_needed(self):
+        """Downloads and extracts the dataset if not present."""
+        
+        # 1. Check if tweets.csv exists
+        if os.path.exists(self.csv_path):
+            console.print(f"[green]✔ Dataset found at {self.csv_path}.[/green]")
+            return
+
+        # 2. Check if tweets.zip exists, if not download
+        if not os.path.exists(self.zip_path):
+            console.print("[yellow]Dataset missing. Downloading tweets.zip...[/yellow]")
+            try:
+                with requests.get(self.repo_url, stream=True) as r:
+                    r.raise_for_status()
+                    total_size = int(r.headers.get('content-length', 0))
+                    
+                    with open(self.zip_path, 'wb') as f, Progress(
+                        SpinnerColumn(), TextColumn("[progress.description]{task.description}"), BarColumn(), TaskProgressColumn()
+                    ) as progress:
+                        task = progress.add_task("[cyan]Downloading...", total=total_size)
+                        for chunk in r.iter_content(chunk_size=8192):
+                            f.write(chunk)
+                            progress.update(task, advance=len(chunk))
+                            
+                console.print(f"[green]✔ Download complete: {self.zip_path}[/green]")
+            except Exception as e:
+                console.print(f"[red]❌ Download failed: {e}[/red]")
+                return
+
+        # 3. Validating Zip
+        if not os.path.exists(self.zip_path): 
+             console.print(f"[red]❌ Error: {self.zip_path} not found after download attempt.[/red]")
+             return
+
+        # 4. Extracting and Renaming
+        console.print("[yellow]Extracting tweets.csv from zip...[/yellow]")
+        try:
+            with zipfile.ZipFile(self.zip_path, 'r') as zip_ref:
+                # The file inside the repo structure
+                # We know the structure: turkish-tweets-sentiment-analysis-master/data/TurkishTweets.csv
+                # But let's search for it to be safe
+                target_file = None
+                for file_name in zip_ref.namelist():
+                    if file_name.endswith("TurkishTweets.csv"):
+                        target_file = file_name
+                        break
+                
+                if target_file:
+                    with zip_ref.open(target_file) as source, open(self.csv_path, "wb") as target:
+                        shutil.copyfileobj(source, target)
+                    console.print(f"[green]✔ Extracted and renamed to {self.csv_path}.[/green]")
+                else:
+                    console.print("[red]❌ 'TurkishTweets.csv' not found within the zip.[/red]")
+        except zipfile.BadZipFile:
+            console.print("[red]❌ Error: The downloaded file is not a valid zip.[/red]")
+
     def _get_fallback_mock_data(self, count):
-        """Fallback mock data if API fails or no key."""
-        # ... (Same fallback data as before) ...
+        """Fallback mock data if CSV is missing."""
         mock_templates = [
             f"{self.topic} dünyayı değiştirecek! #AI #Gelecek",
             f"{self.topic} hakkında harika bir makale okudum.",
@@ -28,75 +94,58 @@ class DataCollector:
             "I'm skeptical about the ethics of AI.",
             "Machine learning is specifically fascinating."
         ]
-        return [random.choice(mock_templates) for _ in range(count)]
-
-    def _generate_with_gemini(self, count):
-        """Generates realistic tweets using Google Gemini API (New SDK)."""
-        if not self.api_key:
-            return None
-
-        try:
-            client = genai.Client(api_key=self.api_key)
-            
-            prompt = f"""
-            You are a social media data generator. Generate {count} unique, realistic tweets/posts about "{self.topic}".
-            
-            Rules:
-            1. Mix of Turkish and English.
-            2. Vary the sentiment (positive, negative, neutral).
-            3. Include some "noise" like typos, slang, hashtags, and URLs.
-            4. Make them look like real user opinions, news, or complaints.
-            5. Return ONLY the raw texts, separated by a pipe character (|). Do not number them.
-            
-            Example output format:
-            This is a tweet|Another one here|Yapay zeka harika!
-            """
-            
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=prompt
-            )
-            
-            if response.text:
-                tweets = response.text.split('|')
-                tweets = [t.strip() for t in tweets if t.strip()]
-                return tweets
-        except Exception as e:
-            print(f"Gemini API Error: {e}")
-            return None
-        return None
+        
+        data = []
+        for _ in range(count):
+            data.append({
+                "id": str(uuid.uuid4()),
+                "text": random.choice(mock_templates),
+                "user": random.choice(self.users),
+                "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "platform": "Twitter (Mock)"
+            })
+        return data
 
     def generate_data(self, count=50):
-        data = []
+        self._download_and_extract_if_needed()
         
-        # Try fetching real generative data
-        texts = self._generate_with_gemini(count)
+        print(f"Loading real tweets from local dataset...")
         
-        if not texts or len(texts) < count:
-            # Output info only if falling back
-            if not texts:
-                texts = []
-            remaining = count - len(texts)
-            if remaining > 0:
-                texts.extend(self._get_fallback_mock_data(remaining))
+        if os.path.exists(self.csv_path):
+            try:
+                df = pd.read_csv(self.csv_path)
+                # Sample random rows
+                if len(df) > count:
+                    sample = df.sample(n=count)
+                else:
+                    sample = df
+                
+                data = []
+                for _, row in sample.iterrows():
+                    # The dataset has 'Tweet' column
+                    text = row['Tweet']
+                    
+                    # Randomize date within last 30 days
+                    days_back = random.randint(0, 30)
+                    date = datetime.now() - timedelta(days=days_back, minutes=random.randint(0, 1440))
+                    
+                    record = {
+                        "id": str(uuid.uuid4()),
+                        "text": text,
+                        "user": random.choice(self.users),
+                        "date": date.strftime("%Y-%m-%d %H:%M:%S"),
+                        "platform": "Twitter (Dataset)"
+                    }
+                    data.append(record)
+                
+                print(f"✅ Successfully loaded {len(data)} tweets from dataset.")
+                return pd.DataFrame(data)
+                
+            except Exception as e:
+                print(f"❌ Error reading CSV: {e}")
         
-        texts = texts[:count]
-
-        for text in texts:
-            # Simulate date
-            days_back = random.randint(0, 30)
-            date = datetime.now() - timedelta(days=days_back, minutes=random.randint(0, 1440))
-            
-            record = {
-                "id": str(uuid.uuid4()),
-                "text": text,
-                "user": random.choice(self.users),
-                "date": date.strftime("%Y-%m-%d %H:%M:%S"),
-                "platform": random.choice(["Twitter", "Instagram", "LinkedIn"])
-            }
-            data.append(record)
-            
-        return pd.DataFrame(data)
+        print("⚠️ CSV not found or error. Using mock data.")
+        return pd.DataFrame(self._get_fallback_mock_data(count))
 
 if __name__ == "__main__":
     dc = DataCollector()

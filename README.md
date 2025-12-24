@@ -6,9 +6,8 @@ Bu proje, Sosyal Medya verileri üzerinde Veri Madenciliği tekniklerini (Ön i�
 
 1.  **Veri Toplama (Data Collection)**:
 
-    - **Google Gemini API (google-genai)** kullanılarak gerçekçi, tekrar etmeyen tweet verileri üretilir.
-    - API anahtarı yoksa otomatik olarak "Mock" (sahte) veriye geçiş yapar.
-    - Veriler `date`, `user`, `text`, `platform` alanlarını içerir.
+    - **Otomatik Veri İndirme**: Proje çalıştırıldığında, gerçek bir Türkçe Tweet veri seti (`TurkishTweets.csv`) otomatik olarak GitHub'dan indirilir ve zipten çıkarılır (`tweets.csv`).
+    - **Yapay Zeka Ve Scraping Yok**: Veri üretimi için herhangi bir yapay zeka veya scraping tool (Twint/Ntscraper) kullanılmamaktadır; tamamen gerçek kullanıcı verileri üzerinden analiz yapılır.
 
 2.  **Ön İşleme (Preprocessing)**:
 
@@ -38,7 +37,6 @@ Lütfen aşağıdaki adımları sırasıyla terminalinizde uygulayınız.
 ### 1. Gereksinimler
 
 - Python 3.9 veya üzeri
-- [Opsiyonel] Google Gemini API Anahtarı (Daha gerçekçi veri üretimi için)
 
 ### 2. Proje Dosyalarına Gitme
 
@@ -82,24 +80,13 @@ Her şey hazır! Uygulamayı başlatmak için:
 python main.py
 ```
 
+- Program ilk çalıştırıldığında gerekli veri setini otomatik olarak indirecektir.
+
 Program analizleri tamamladıktan sonra size **Dashboard'u açmak isteyip istemediğinizi** soracaktır:
 
 > **Do you want to visualize the results (Streamlit Dashboard)? [y/n]**
 
 `y` yazıp onaylarsanız, tarayıcınızda açılan **Streamlit Dashboard** üzerinden verileri interaktif olarak inceleyebilirsiniz.
-
-## API Anahtarı Hakkında (Opsiyonel)
-
-Proje varsayılan olarak **API anahtarı olmadan da çalışır**. Bu durumda önceden hazırlanmış şablon verileri kullanır.
-
-Eğer gerçek zamanlı yapay zeka tarafından üretilen verilerle denemek isterseniz:
-
-1.  Proje ana dizininde `.env` adında bir dosya oluşturun.
-2.  İçerisine şu satırı ekleyin:
-    ```
-    GEMINI_API_KEY=AIzaSy... (Sizin anahtarınız)
-    ```
-3.  Uygulamayı yeniden başlatın.
 
 ## Çıktılar
 
