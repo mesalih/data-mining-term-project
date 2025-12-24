@@ -50,12 +50,12 @@ class DataCollector:
                             
                 console.print(f"[green]✔ Download complete: {self.zip_path}[/green]")
             except Exception as e:
-                console.print(f"[red]❌ Download failed: {e}[/red]")
+                console.print(f"[red] Download failed: {e}[/red]")
                 return
 
         # 3. Validating Zip
         if not os.path.exists(self.zip_path): 
-             console.print(f"[red]❌ Error: {self.zip_path} not found after download attempt.[/red]")
+             console.print(f"[red] Error: {self.zip_path} not found after download attempt.[/red]")
              return
 
         # 4. Extracting and Renaming
@@ -76,9 +76,9 @@ class DataCollector:
                         shutil.copyfileobj(source, target)
                     console.print(f"[green]✔ Extracted and renamed to {self.csv_path}.[/green]")
                 else:
-                    console.print("[red]❌ 'TurkishTweets.csv' not found within the zip.[/red]")
+                    console.print("[red] 'TurkishTweets.csv' not found within the zip.[/red]")
         except zipfile.BadZipFile:
-            console.print("[red]❌ Error: The downloaded file is not a valid zip.[/red]")
+            console.print("[red] Error: The downloaded file is not a valid zip.[/red]")
 
     def _get_fallback_mock_data(self, count):
         """Fallback mock data if CSV is missing."""
@@ -138,13 +138,13 @@ class DataCollector:
                     }
                     data.append(record)
                 
-                print(f"✅ Successfully loaded {len(data)} tweets from dataset.")
+                print(f"Successfully loaded {len(data)} tweets from dataset.")
                 return pd.DataFrame(data)
                 
             except Exception as e:
-                print(f"❌ Error reading CSV: {e}")
+                print(f"Error reading CSV: {e}")
         
-        print("⚠️ CSV not found or error. Using mock data.")
+        print("CSV not found or error. Using mock data.")
         return pd.DataFrame(self._get_fallback_mock_data(count))
 
 if __name__ == "__main__":

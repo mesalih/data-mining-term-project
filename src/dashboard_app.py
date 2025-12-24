@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import os
 
 # Set page config
@@ -131,7 +130,7 @@ def main():
     # Data Table
     st.markdown("---")
     st.subheader("Raw Data Explorer")
-    search_term = st.text_input("🔍 Search in tweets:", "")
+    search_term = st.text_input("Search in tweets:", "")
     
     if search_term:
         display_df = filtered_df[filtered_df['text'].str.contains(search_term, case=False, na=False)]

@@ -71,6 +71,6 @@ class Preprocessor:
 
 if __name__ == "__main__":
     p = Preprocessor()
-    sample = "Yapay zeka geleceği ele geçirecek mi? 🤖 Check this out: http://test.com"
+    sample = "Yapay zeka geleceği ele geçirecek mi? Check this out: http://test.com"
     print(f"Original: {sample}")
     print(f"Processed: {p.process(sample)}")

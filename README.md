@@ -2,7 +2,7 @@
 
 Bu proje, Sosyal Medya verileri üzerinde Veri Madenciliği tekniklerini (Ön işleme, Duygu Analizi, Kümeleme) uygulamalı olarak göstermektedir. Proje, Python dili ve `rich` kütüphanesi kullanılarak interaktif bir terminal uygulaması olarak tasarlanmıştır.
 
-## 🚀 Özellikler (Features)
+## Özellikler (Features)
 
 1.  **Veri Toplama (Data Collection)**:
 

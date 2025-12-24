@@ -1,6 +1,5 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
-import pandas as pd
 
 class TopicClusterer:
     def __init__(self, n_clusters=3):

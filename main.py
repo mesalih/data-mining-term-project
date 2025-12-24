@@ -1,5 +1,4 @@
 import time
-import pandas as pd
 from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -33,7 +32,7 @@ def main():
         df = collector.generate_data(count=100) # Generating 100 rows
         progress.update(task, completed=10)
 
-    console.print(f"✅ Successfully collected [bold]{len(df)}[/bold] items.")
+    console.print(f"Successfully collected [bold]{len(df)}[/bold] items.")
     
     # Show Raw Data Sample
     table = Table(title="Raw Data Sample (First 5)")
@@ -60,7 +59,7 @@ def main():
             time.sleep(0.01) # Simulate work
     
     df['processed_text'] = processed_texts
-    console.print("✅ Preprocessing complete.")
+    console.print("Preprocessing complete.")
     console.print(f"[italic]Example transformation:[/italic]\n[red]Original:[/red] {df['text'].iloc[0]}\n[green]Processed:[/green] {df['processed_text'].iloc[0]}")
     time.sleep(1)
 
