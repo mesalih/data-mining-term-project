@@ -114,6 +114,9 @@ class DataCollector:
         if os.path.exists(self.csv_path):
             try:
                 df = pd.read_csv(self.csv_path)
+                # Drop rows with NaN in 'Tweet' column
+                df = df.dropna(subset=['Tweet'])
+                
                 # Sample random rows
                 if len(df) > count:
                     sample = df.sample(n=count)
@@ -123,7 +126,7 @@ class DataCollector:
                 data = []
                 for _, row in sample.iterrows():
                     # The dataset has 'Tweet' column
-                    text = row['Tweet']
+                    text = str(row['Tweet']) # Ensure string
                     
                     # Randomize date within last 30 days
                     days_back = random.randint(0, 30)
